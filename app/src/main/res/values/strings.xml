@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">SimpleKeystoreApp</string>
+    <string name="title_activity_main">MainActivity</string>
+
+    <string name="generate">Generate New Key</string>
+    <string name="delete">Delete key</string>
+    <string name="encrypt">Encrypt</string>
+    <string name="decrypt">Decrypt</string>
+    <string name="key_alias">Key Alias</string>
+    <string name="initial_text">Initial Text</string>
+    <string name="final_text">Encrypted Text</string>
+    <string name="decrypt_result">Decrypted Text</string>
+</resources>

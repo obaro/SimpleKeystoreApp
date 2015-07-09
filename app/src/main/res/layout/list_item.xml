@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/cardBackground"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    card_view:cardCornerRadius="4dp"
+    android:layout_margin="5dp">
+
+    <TextView
+        android:id="@+id/keyAlias"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:textSize="30dp"/>
+
+    <Button
+        android:id="@+id/deleteButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/keyAlias"
+        android:layout_alignParentLeft="true"
+        android:layout_centerHorizontal="true"
+        android:text="@string/delete"
+        style="@style/Base.Widget.AppCompat.Button.Borderless" />
+
+    <Button
+        android:id="@+id/encryptButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/keyAlias"
+        android:layout_alignRight="@+id/keyAlias"
+        android:text="@string/encrypt"
+        style="@style/Base.Widget.AppCompat.Button.Borderless"/>
+
+    <Button
+        android:id="@+id/decryptButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/keyAlias"
+        android:layout_toLeftOf="@+id/encryptButton"
+        android:text="@string/decrypt"
+        style="@style/Base.Widget.AppCompat.Button.Borderless"/>
+
+</RelativeLayout>
