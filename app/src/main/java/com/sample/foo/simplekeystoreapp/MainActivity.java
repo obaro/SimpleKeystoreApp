@@ -2,8 +2,11 @@ package com.sample.foo.simplekeystoreapp;
 
 import android.content.Context;
 import android.content.DialogInterface;
+import android.os.Build;
 import android.security.KeyPairGeneratorSpec;
 import android.os.Bundle;
+import android.security.keystore.KeyGenParameterSpec;
+import android.security.keystore.KeyProperties;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Base64;
@@ -25,6 +28,7 @@ import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
+import java.security.Security;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.util.ArrayList;
@@ -90,23 +94,40 @@ public class MainActivity extends AppCompatActivity {
             listAdapter.notifyDataSetChanged();
     }
 
+    @SuppressWarnings({"NewApi", "deprecation"})
     public void createNewKeys(View view) {
         String alias = aliasText.getText().toString();
         try {
             // Create new key if needed
             if (!keyStore.containsAlias(alias)) {
-                Calendar start = Calendar.getInstance();
-                Calendar end = Calendar.getInstance();
-                end.add(Calendar.YEAR, 1);
-                KeyPairGeneratorSpec spec = new KeyPairGeneratorSpec.Builder(this)
-                        .setAlias(alias)
-                        .setSubject(new X500Principal("CN=Sample Name, O=Android Authority"))
-                        .setSerialNumber(BigInteger.ONE)
-                        .setStartDate(start.getTime())
-                        .setEndDate(end.getTime())
-                        .build();
+
+
                 KeyPairGenerator generator = KeyPairGenerator.getInstance("RSA", "AndroidKeyStore");
-                generator.initialize(spec);
+
+                //if(Build.VERSION.SDK_INT <= 18) {
+                    Calendar start = Calendar.getInstance();
+                    Calendar end = Calendar.getInstance();
+                    end.add(Calendar.YEAR, 1);
+
+                    KeyPairGeneratorSpec spec = new KeyPairGeneratorSpec.Builder(this)
+                            .setAlias(alias)
+                            .setSubject(new X500Principal("CN=Sample Name, O=Android Authority"))
+                            .setSerialNumber(BigInteger.ONE)
+                            .setStartDate(start.getTime())
+                            .setEndDate(end.getTime())
+                            .build();
+
+                    generator.initialize(spec);
+                //}
+                /*else {
+
+                    generator.initialize(new KeyGenParameterSpec.Builder
+                            (alias, KeyProperties.PURPOSE_SIGN)
+                            .setDigests(KeyProperties.DIGEST_SHA256)
+                            .setSignaturePaddings(KeyProperties.SIGNATURE_PADDING_RSA_PKCS1)
+                            .build());
+
+                }*/
 
                 KeyPair keyPair = generator.generateKeyPair();
             }
@@ -155,7 +176,9 @@ public class MainActivity extends AppCompatActivity {
                 return;
             }
 
-            Cipher inCipher = Cipher.getInstance("RSA/ECB/PKCS1Padding", "AndroidOpenSSL");
+            //Security.getProviders();
+
+            Cipher inCipher = Cipher.getInstance("RSA/ECB/PKCS1Padding", "AndroidKeyStoreBCWorkaround");
             inCipher.init(Cipher.ENCRYPT_MODE, publicKey);
 
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
@@ -175,10 +198,9 @@ public class MainActivity extends AppCompatActivity {
     public void decryptString(String alias) {
         try {
             KeyStore.PrivateKeyEntry privateKeyEntry = (KeyStore.PrivateKeyEntry)keyStore.getEntry(alias, null);
-            RSAPrivateKey privateKey = (RSAPrivateKey) privateKeyEntry.getPrivateKey();
 
-            Cipher output = Cipher.getInstance("RSA/ECB/PKCS1Padding", "AndroidOpenSSL");
-            output.init(Cipher.DECRYPT_MODE, privateKey);
+            Cipher output = Cipher.getInstance("RSA/ECB/PKCS1Padding", "AndroidKeyStoreBCWorkaround");
+            output.init(Cipher.DECRYPT_MODE, privateKeyEntry.getPrivateKey());
 
             String cipherText = encryptedText.getText().toString();
             CipherInputStream cipherInputStream = new CipherInputStream(
